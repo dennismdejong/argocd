@@ -1,0 +1,9 @@
+# k8s-apps/cert-manager/ca-issuer.yaml
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-ca
+spec:
+  ca:
+    secretName: selfsigned-ca-secret

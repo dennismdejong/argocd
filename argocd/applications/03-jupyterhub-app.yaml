@@ -5,25 +5,50 @@ kind: Application
 metadata:
   name: jupyterhub
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://jupyterhub.github.io/helm-chart/ # Externe Helm Repo
+    # --- SINGLE SOURCE: De JupyterHub Helm Chart ---
+    repoURL: https://jupyterhub.github.io/helm-chart/
     targetRevision: 4.3.1
     chart: jupyterhub
-    helm:
-      # Gebruik de values uit je eigen Git-repository
-      valueFiles:
-        - $values/k8s-apps/jupyterhub/values.yaml 
-      parameters: # Dit definieert $values als je eigen repo
-        - name: "base.url"
-          value: "git@github.com:dennismdejong/argocd.git" 
-        - name: "base.revision"
-          value: "HEAD"
+    # De 'path' is niet nodig omdat we de waarden hieronder injecteren
+  
   destination:
     server: https://kubernetes.default.svc
     namespace: jupyterhub
+  
+  helm:
+    # --- DE PROBLEEMOPLOSSING: Ruwe Waarden Injecteren ---
+    # Alle custom values van jouw values.yaml worden hier geplakt
+    values: | 
+      # Dit is de inhoud van jouw k8s-apps/jupyterhub/values.yaml
+      ingress:
+        enabled: true
+        hosts:
+          - hub.jouwdomein.nl
+        annotations:
+          cert-manager.io/cluster-issuer: "selfsigned-ca" 
+          kubernetes.io/ingress.class: "nginx" 
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true" 
+        tls:
+          - hosts:
+              - hub.jouwdomein.nl
+            secretName: jupyterhub-tls-secret
+      proxy:
+        service:
+          type: ClusterIP
+      hub:
+        cookieSecret: "<een-zeer-lange-willekeurige-string>" # VERVANGEN!
+      auth:
+        type: dummy
+      # ... (eventuele andere waarden)
+
   syncPolicy:
-    automated: { prune: true, selfHeal: true }
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true

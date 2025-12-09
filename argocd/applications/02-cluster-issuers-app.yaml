@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:<jouw_gebruikersnaam>/<jouw_gitops_repo>.git # Je eigen Repo
+    repoURL: git@github.com:dennismdejong/argocd.git # Je eigen Repo
     targetRevision: HEAD
     path: k8s-apps/cert-manager # Pad naar de letsencrypt-prod.yaml
   destination:
