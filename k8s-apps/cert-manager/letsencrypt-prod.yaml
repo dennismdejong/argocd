@@ -1,0 +1,16 @@
+# k8s-apps/cert-manager/letsencrypt-prod.yaml
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod 
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: jouw-mailadres@jouwdomein.nl # VERVANGEN
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx # Moet overeenkomen met je Ingress Controller

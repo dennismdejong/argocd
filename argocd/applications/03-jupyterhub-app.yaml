@@ -1,0 +1,29 @@
+# argocd/applications/03-jupyterhub-app.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jupyterhub
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://jupyterhub.github.io/helm-chart/ # Externe Helm Repo
+    targetRevision: 4.3.1
+    chart: jupyterhub
+    helm:
+      # Gebruik de values uit je eigen Git-repository
+      valueFiles:
+        - $values/k8s-apps/jupyterhub/values.yaml 
+      parameters: # Dit definieert $values als je eigen repo
+        - name: "base.url"
+          value: "git@github.com:dennismdejong/argocd.git" 
+        - name: "base.revision"
+          value: "HEAD"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jupyterhub
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,19 @@
+# argocd/applications/02-cluster-issuers-app.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-issuers
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:<jouw_gebruikersnaam>/<jouw_gitops_repo>.git # Je eigen Repo
+    targetRevision: HEAD
+    path: k8s-apps/cert-manager # Pad naar de letsencrypt-prod.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager # ClusterIssuers zijn namespace-agnostisch, maar je kunt ze in de cert-manager NS plaatsen
+  # Zorg ervoor dat deze App pas synchroniseert nadat cert-manager-install klaar is! (via de UI of een dependency tool)
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }

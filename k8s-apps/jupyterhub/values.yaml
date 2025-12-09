@@ -1,0 +1,31 @@
+# k8s-apps/jupyterhub/values.yaml
+
+# Ingress: Externe toegang via NGINX Ingress Controller
+ingress:
+  enabled: true
+  hosts:
+    - hub.jouwdomein.nl # VERVANGEN
+  
+  # Cruciale Annotaties voor cert-manager en HTTPS-redirect
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # Referentie naar de ClusterIssuer
+    kubernetes.io/ingress.class: "nginx" # Specificeer de Ingress Controller
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true" # Forceer HTTPS
+  
+  # TLS: Dit creëert de Certificate-resource, beheerd door cert-manager
+  tls:
+    - hosts:
+        - hub.jouwdomein.nl
+      secretName: jupyterhub-tls-secret # Secret die cert-manager zal creëren
+
+# Proxy: Standaard ClusterIP voor interne K8s Service
+proxy:
+  service:
+    type: ClusterIP
+
+# Hub en Auth: Basisinstellingen voor JupyterHub
+hub:
+  cookieSecret: "<een-zeer-lange-willekeurige-string>" # VERVANGEN! Gebruik een unieke, lange string.
+
+auth:
+  type: dummy # DummyAuthenticator voor testen, vervang dit voor productie
