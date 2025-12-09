@@ -1,0 +1,15 @@
+# k8s-apps/cert-manager/selfsigned-ca.yaml
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: selfsigned-ca-root
+  namespace: cert-manager # Kan in elke namespace, maar cert-manager is gebruikelijk
+spec:
+  isCA: true # Dit is CRUCIAAL: Dit maakt het een Certificate Authority
+  commonName: Minikube Internal CA
+  secretName: selfsigned-ca-secret # Dit is de Secret die ontbreekt!
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
